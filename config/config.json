@@ -1,0 +1,4 @@
+{
+  "local_savefile_path" : "The path of the savefile on your machine",
+  "drive_savefile_path" : "The ID (drive.google.com/drive/folders/ID) of the Google Drive folder where you want to save the savefile"
+}

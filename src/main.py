@@ -2,12 +2,18 @@ from typing import Union
 
 import psutil
 
-import google.auth
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+import json
+
+from google_lib import service_setup, upload_file
 
 import requests
+
+def load_config() -> dict:
+
+    file = open("config/config.json")
+    data = json.load(file)
+
+    return data
 
 def get_process_list() -> list[dict[str, Union[str, int]]]:
 
@@ -27,22 +33,16 @@ def is_baldur_running(processes: list[dict[str, Union[str, int]]]) -> bool:
         return False
 
 
+# Gestire metadati ??
 def upload_savefile2():
-
-    credentials = ""
-
-    try:
-        service = build("drive", "v3", credentials=credentials)
-
-    except HttpError as errorLog:
-        print("Error: " + errorLog)
 
     print("Uploaded")
 
 
-def upload_savefile():
+def upload_savefile(folder_id: str, file_path: str):
 
-    url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+    service = service_setup()
+    upload_file(service, folder_id, file_path)
 
     print("Uploaded")
 
@@ -52,13 +52,16 @@ def main():
 
     # Lista processi --> Baldur running? --> Si: End
     #                                    --> No: Carico su drive
-    
+
+    config_data = load_config()
+
     processes = get_process_list()
     if(is_baldur_running(processes)):
         print("Baldur's Gate is running")
         return
     else:
         print("Baldur's Gate is closed. Uploading savefiles.")
-        upload_savefile()
+        upload_savefile(config_data['drive_savefile_path'], config_data['local_savefile_path'])
+
 
 main()
